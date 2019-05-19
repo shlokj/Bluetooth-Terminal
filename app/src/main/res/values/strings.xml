@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Bluetooth Terminal</string>
+    <string name="send_data">Send</string>
+    <string name="about">This app is a one-way minimal terminal aiming to be useful for making and testing Bluetooth-based prototyping projects, especially those using the HC-05.\n\nCreated by Shlok Jhawar.</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    <item
+        android:id="@+id/contact_us_sendemail"
+        android:title="@string/contact_us">
+    </item>-->
+    <item
+        android:id="@+id/disconnect"
+        android:title="Disconnect">
+    </item>
+    <item
+        android:id="@+id/chooseDevice"
+        android:title="Choose device again">
+    </item>
+    <item
+        android:id="@+id/aboutDeveloper"
+        android:title="About">
+    </item>
+    <item
+        android:id="@+id/btsettings"
+        android:title="Open Bluetooth settings">
+    </item>
+</menu>
