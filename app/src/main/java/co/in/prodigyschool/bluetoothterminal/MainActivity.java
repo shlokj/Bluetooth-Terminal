@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private ArrayAdapter<String> mBTArrayAdapter;
     int sentDataNumber=0;
-
+    TextView sentData;
 
     public void composeEmail(String message) {
         Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","shlokj@gmail.com", null));
@@ -84,33 +84,22 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-
-
     public void displayPairedDevices(){
         mBTArrayAdapter.clear();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         for (BluetoothDevice device : pairedDevices)
             mBTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-        android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
         View convertView = (View) inflater.inflate(R.layout.dialog_btdevices, null);
         alertDialog.setView(convertView);
         alertDialog.setTitle("Select your device");
         alertDialog.setMessage("Your device must be paired for it to appear in this list. If this is the first time you are using this Android device with your Bluetooth module, you will need to pair it in settings.");
         alertDialog.setCancelable(false);
-        alertDialog.setNeutralButton("Open settings", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intentOpenBluetoothSettings = new Intent();
-                intentOpenBluetoothSettings.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-                startActivity(intentOpenBluetoothSettings);
-                displayPairedDevices();
-            }
-        });
         ListView devicesListView = (ListView) convertView.findViewById(R.id.mDevicesListView);
         devicesListView.setAdapter(mBTArrayAdapter);
-        final android.app.AlertDialog dialog = alertDialog.show();
+        final AlertDialog dialog = alertDialog.show();
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -134,15 +123,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mBTArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
-        if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-            displayPairedDevices();
-        }
+
         List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
         ActionBar actionBar = getSupportActionBar();
         bluetoothObject = new Bluetooth(getApplicationContext());
         bluetoothObject.onStart();
         bluetoothObject.enable();
-        final TextView sentData = (TextView) findViewById(R.id.sent_data);
+        if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+            displayPairedDevices();
+        }
+        sentData = (TextView) findViewById(R.id.sent_data);
         sentData.setMovementMethod(new ScrollingMovementMethod());
         bluetoothObject.setBluetoothCallback(new BluetoothCallback() {
             @Override
@@ -152,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
             public void onBluetoothOn() {
                 displayPairedDevices();
             }
-
             @Override
             public void onBluetoothTurningOff() { }
 
@@ -166,12 +155,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDeviceConnected(BluetoothDevice device) {
                 progressDialog.dismiss();
-                sentData.append("Connected to "+name+"\n\n");
+//                tellUserConnected();
             }
-
             @Override
             public void onDeviceDisconnected(BluetoothDevice device, String message) { }
-
             @Override
             public void onMessage(String message) { }
             @Override
@@ -180,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             public void onConnectError(BluetoothDevice device, String message) { }
         });
 
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(MainActivity.this);
         final Vibrator vibrator = (Vibrator) getSystemService(MainActivity.this.VIBRATOR_SERVICE);
         final Switch newline = (Switch) findViewById(R.id.nl);
         final Switch carreturn = (Switch) findViewById(R.id.cr);
@@ -221,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     bluetoothObject.send(dataTBS+nl+cr);
 //                    Toast.makeText(getApplicationContext(), "Data sent", Toast.LENGTH_SHORT).show();
                     sentDataNumber++;
-                    sentData.append(sentDataNumber + ". " + dataTBS);
+                    sentData.append(sentDataNumber + ". " + dataTBS + "\n");
                     vibrator.vibrate(40);
                 }
                 else if (!bluetoothObject.isConnected()) {
@@ -235,13 +222,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
+/*    @Override
     protected void onResume() {
         super.onResume();
         if (!bluetoothObject.isConnected()){
             displayPairedDevices();
         }
-    }
+    }*/
 
     private void bluetoothOn(){
         if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
@@ -255,6 +242,10 @@ public class MainActivity extends AppCompatActivity {
 //            mBTArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
 //            displayPairedDevices();
         }
+    }
+
+    public void tellUserConnected(){
+        sentData.append("Connected to "+name+"\n\n");
     }
 
     @Override
